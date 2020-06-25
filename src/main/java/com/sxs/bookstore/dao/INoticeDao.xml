@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sxs.bookstore.dao.INoticeDao">
+
+   <!--查找本周最新的公告 -->
+  <select id="findNotice" resultType="notice">
+      select * from notice
+      order by n_time desc limit 1
+  </select>
+
+   <!--查找本周最热卖的两件商品 -->
+  <select id="findWeekHotProduct" resultType="product">
+         select products.id,products.name,products.imgurl,SUM(orderitem.buynum) totalsalnum
+         from orderitem,orders,products
+         where orderitem.order_id=orders.id
+         and products.id=orderitem.product_id
+         and orders.paystatus=1
+         and orders.ordertime &lt; DATE_SUB(NOW(),INTERVAL 7 DAY)
+         GROUP BY products.id,products.name,products.imgurl
+         order BY totalsalnum DESC limit 2
+  </select>
+</mapper>
+

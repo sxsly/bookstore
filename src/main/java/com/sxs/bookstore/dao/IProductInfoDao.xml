@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sxs.bookstore.dao.IProductInfoDao">
+    <!--查询商品的总记录数-->
+    <select id="findProductsCount" resultType="int">
+        select count(*) from products
+        <where>
+            <if test="category != null and category != '' and category != '全部商品'">
+                category = #{category}
+            </if>
+        </where>
+    </select>
+    <!--查询商品信息-->
+   <select id="findProducts" resultType="product">
+       select * from products
+       <where>
+           <if test="category != null and category != '' and category != '全部商品'">
+               category = #{category}
+           </if>
+       </where>
+       limit #{firstLimitParam},#{pageSize}
+   </select>
+
+    <!--按照书名查找所有的记录数-->
+    <select id="findBooksCount" resultType="int">
+        select count(*) from products
+        <where>
+            <if test="bookname != null and bookname != '' and bookname != '请输入书名'">
+                name like "%"#{bookname}"%"
+            </if>
+        </where>
+    </select>
+
+    <!--按照书名查询所有的书籍-->
+    <select id="findBooksByName" resultType="product">
+        select * from products
+        <where>
+            <if test="bookname != null and bookname != '' and bookname != '请输入书名'">
+                name like "%"#{bookname}"%"
+            </if>
+        </where>
+        limit #{firstLimitParam},#{pageSize}
+    </select>
+
+    <!--根据id查找书籍-->
+    <select id="findProductById" resultType="product">
+        select * from products
+        <where>
+            <if test="id != null and id != ''">
+                id = #{id}
+            </if>
+        </where>
+    </select>
+
+    <!--提交订单后，修改剩余产品的数量-->
+    <update id="updateProductPnum" parameterType="OrderItem">
+        update products
+        set pnum = pnum - #{buynum}
+        where id = #{product.id}
+    </update>
+
+    <!--将订单信息插入OrderItem表-->
+    <insert id="insertOrderItem" parameterType="OrderItem">
+        insert into orderitem(order_id,product_id,buynum)
+        values(#{order.id},#{product.id},#{buynum})
+    </insert>
+
+    <!--将订单信息插入到订单表order-->
+    <insert id="insertOrder" parameterType="Order">
+        insert into orders(id,money,receiveraddress,receivername,receiverphone,user_id)
+        values(#{id},#{money},#{receiveraddress},#{receivername},#{receiverphone},#{user.id})
+    </insert>
+</mapper>
+

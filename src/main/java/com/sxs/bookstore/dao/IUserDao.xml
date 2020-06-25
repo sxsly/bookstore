@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sxs.bookstore.dao.IUserDao">
+    <!--<select id="selectUsers" resultType="user">-->
+        <!--select * from user where id=8-->
+    <!--</select>-->
+
+    <!--注册会员信息-->
+    <insert id="insertUser" parameterType="user">
+        insert into
+        user(username,password,gender,email,telphone,introduce,activecode,role)
+        values (#{username},#{password},#{gender},#{email},#{telphone},#{introduce},#{activecode},#{role})
+    </insert>
+
+    <!--根据账号查找数据库中的激活码-->
+    <select id="findCode" resultType="string">
+        select activeCode from user
+        where username = #{activeUsername}
+    </select>
+
+    <!--激活成功后修改用户的状态-->
+    <update id="modifyStatus">
+        update user set status = "1"
+        where username = #{activeUsername}
+    </update>
+
+    <!--查看当前账号的激活状态-->
+    <select id="selectStatus" resultType="String">
+        select status from user
+        where username = #{activeUsername}
+    </select>
+
+    <!--用户登录-->
+    <select id="selectUser" resultType="user">
+        select * from user
+        where username = #{username} and password = #{password}
+        <!--<<where>-->
+        <!--<if test="username != null and username != ''">-->
+            <!--username = #{username}-->
+        <!--</if>-->
+        <!--<if test="password != null and password != ''">-->
+            <!--and password = #{password}-->
+        <!--</if>-->
+    <!--</where>-->
+    </select>
+
+    <!--查找邮箱是否存在-->
+    <select id="findUserByEmail" resultType="user">
+        select * from user
+        where email = #{email}
+    </select>
+
+    <!--查找用户名是否存在-->
+    <select id="findUserByUsername" resultType="user">
+        select * from user
+        where username = #{username}
+    </select>
+
+    <!--修改用户信息-->
+    <update id="modifyUserInfo" parameterType="user">
+        update user set password = #{password},
+        gender = #{gender},telphone = #{telphone}
+        where username = #{username}
+    </update>
+</mapper>
+

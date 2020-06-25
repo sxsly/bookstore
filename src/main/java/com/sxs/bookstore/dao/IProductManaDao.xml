@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sxs.bookstore.dao.IProductManaDao">
+
+    <!--查询所有记录数-->
+    <select id="findTotalRows" resultType="int">
+        select count(*) from products
+        <where>
+            <if test="product != null and product.id != null and product.id != ''">
+                id = #{product.id}
+            </if>
+
+            <if test="product != null and product.category != null and product.category != ''">
+                and category = #{product.category}
+            </if>
+
+            <if test="product != null and product.name != null and product.name != ''">
+                and name like "%"#{product.name}"%"
+            </if>
+
+            <if test="minPrice != null and minPrice != ''">
+                and price &gt;= #{minPrice}
+            </if>
+
+            <if test="maxPrice != null and maxPrice != ''">
+                and price &lt;= #{maxPrice}
+            </if>
+        </where>
+    </select>
+
+  <!--查询全部商品信息-->
+    <select id="findAllProducts" resultType="Product">
+        select * from products
+        <where>
+            <if test="product != null and product.id != null and product.id != ''">
+                id = #{product.id}
+            </if>
+
+            <if test="product != null and product.category != null and product.category != ''">
+                and category = #{product.category}
+            </if>
+            
+            <if test="product != null and product.name != null and product.name != ''">
+                and name like "%"#{product.name}"%"
+            </if>
+            
+            <if test="minPrice != null and minPrice != ''">
+                and price &gt;= #{minPrice}
+            </if>
+
+            <if test="maxPrice != null and maxPrice != ''">
+                and price &lt;= #{maxPrice}
+            </if>
+        </where>
+        limit #{firstLimitParam},#{pageSize}
+    </select>
+
+    <!--查询所有的商品类别-->
+    <select id="findAllCategories" resultType="Product">
+        select * from products group by category
+    </select>
+
+    <!--添加商品信息-->
+    <insert id="addProduct" parameterType="Product">
+        insert into products(name,price,pnum,category,imgurl,description)
+        values(#{name},#{price},#{pnum},#{category},#{imgurl},#{description})
+    </insert>
+
+    <!--删除商品信息-->
+    <delete id="removeProduct" parameterType="String">
+        delete from products
+        where id = #{id}
+    </delete>
+    
+    <!--修改商品信息-->
+    <update id="modifyProduct" parameterType="Product">
+        update products set name = #{name},price = #{price},
+        pnum = #{pnum},category = #{category},imgurl = #{imgurl},description = #{description}
+        where id = #{id}
+    </update>
+
+    <!--查看销售榜单-->
+    <select id="findProductSalList" resultType="Product">
+        select products.name,SUM(orderitem.buynum) salnum
+        from products,orders,orderitem
+        where orders.paystatus=1
+        and year(ordertime) = #{year}
+        and month(ordertime) = #{month}
+        and orderitem.order_id = orders.id
+        and products.id = orderitem.product_id
+        group by products.id
+        order by salnum desc
+    </select>
+</mapper>
+

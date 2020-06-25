@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sxs.bookstore.dao.IOrderDao">
+
+    <!--查找全部的记录数-->
+    <select id="findTotalRows" resultType="int">
+        select count(*) from orders
+        where user_id = #{id}
+    </select>
+
+  <select id="findOrderByUser" resultType="order">
+      select * from orders
+      where user_id = #{user.id}
+      limit #{pageModel.firstLimitParam},#{pageModel.pageSize}
+  </select>
+
+    <!--根据id查找商品-->
+    <select id="findProductById" resultType="product">
+        select * from products
+        where id = #{product_id}
+    </select>
+
+    <resultMap id="orderItemMap" type="orderItem">
+        <association property="product"
+                     column="product_id"
+                     select="findProductById"/>
+
+        <association property="order"
+                     column="order_id"
+                     select="findOrderById"/>
+    </resultMap>
+
+    <!--根据id查询所有的商品信息-->
+    <select id="findOrderItemById" resultMap="orderItemMap">
+        select * from orderitem
+        where order_id = #{id}
+    </select>
+
+    <!--根据id查找用户-->
+    <select id="findUserById" resultType="User">
+        select * from user where id = #{user_id}
+    </select>
+
+  <resultMap id="findOrderById" type="order">
+      <association property="user"
+                   column="user_id"
+                   select="findUserById"/>
+  </resultMap>
+    
+  <!--根据ID查找订单信息  -->
+    <select id="findOrderById" resultMap="findOrderById">
+        select * from orders
+        where id = #{id}
+    </select>
+
+    <!--根据订单号删除订单-->
+    <delete id="removeOrderById" parameterType="String">
+        delete from orders
+        where id = #{id}
+    </delete>
+
+    <!--根据订单号删除订单item中的信息-->
+    <delete id="removeOrderItemById" parameterType="String">
+        delete from orderitem
+        where order_id = #{id}
+    </delete>
+
+    <!--修改支付状态-->
+    <update id="updatePayStatus" parameterType="String">
+        update orders set paystatus = 1
+        where id = #{id}
+    </update>
+
+    <!--当删除未支付的订单时，商品数量恢复-->
+    <update id="updateProductsPnum" parameterType="OrderItem">
+        update products set pnum = pnum + #{buynum}
+        where id = #{product.id}
+    </update>
+</mapper>
+

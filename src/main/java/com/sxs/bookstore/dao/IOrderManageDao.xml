@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sxs.bookstore.dao.IOrderManageDao">
+
+    <!--查询所有的记录数-->
+    <select id="findTotalRows" resultType="int">
+        select count(*) from orders
+        <where>
+            <if test="id != null and id != ''">
+                id = #{id}
+            </if>
+
+            <if test="receivername != null and receivername != ''">
+                and receivername = #{receivername}
+            </if>
+        </where>
+    </select>
+
+    <!--根据id查找用户-->
+    <select id="findUserById" resultType="User">
+        select * from user where id = #{user_id}
+    </select>
+
+    <resultMap id="findAllOrdersMap" type="Order">
+        <association property="user"
+                     column="user_id"
+                     select="findUserById"/>
+    </resultMap>
+    
+    <select id="findAllOrders" resultMap="findAllOrdersMap">
+         select * from orders
+        <where>
+            <if test="order.id != null and order.id != ''">
+                id = #{order.id}
+            </if>
+
+            <if test="order.receivername != null and order.receivername != ''">
+                and receivername = #{order.receivername}
+            </if>
+        </where>
+        limit #{firstLimitParam},#{pageSize}
+    </select>
+
+</mapper>
+

@@ -1,0 +1,26 @@
+# Spring数据源配置
+spring:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql:///bookstore
+    username: root
+    password: 123456
+
+# mybatis的映射文件定位
+mybatis:
+  mapper-locations: classpath:com/sxs/bookstore/dao/*.xml
+  type-aliases-package: com.sxs.bookstore.beans
+
+# 配置服务器上下文路径
+server:
+  servlet:
+    context-path: /bookstore
+
+# 配置日志文件
+logging:
+  pattern:
+    console: logs-%level %msg%n
+  level:
+    com.sxs.bookstore.dao: debug
+
